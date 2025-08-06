@@ -12,7 +12,7 @@ WORKDIR /app
 
 # Install Python dependencies
 # Install base dependencies first
-RUN pip3 install transformers>=4.46.3 accelerate>=1.2.1 kernels
+RUN pip3 install --upgrade transformers accelerate kernels
 
 # Install PyTorch 2.8.0 with CUDA 12.8
 RUN pip3 install torch==2.8.0 --index-url https://download.pytorch.org/whl/test/cu128

@@ -20,6 +20,7 @@ RUN pip3 install torch==2.8.0 --index-url https://download.pytorch.org/whl/test/
 # Install triton kernels for mxfp4 support (last)
 RUN pip3 install git+https://github.com/triton-lang/triton.git@main#subdirectory=python/triton_kernels
 
+RUN pip3 install --force-reinstall -v "hf_xet==1.1.3"
 # Create cache directory
 RUN mkdir -p /app/cache
 
@@ -28,15 +29,15 @@ ENV HF_HOME=/app/cache
 
 # Download model during build using huggingface_hub
 RUN python3 -c "from huggingface_hub import snapshot_download; \
-import os; \
-os.environ['HF_HOME'] = '/app/cache'; \
-print('Downloading model openai/gpt-oss-20b...'); \
-snapshot_download( \
+    import os; \
+    os.environ['HF_HOME'] = '/app/cache'; \
+    print('Downloading model openai/gpt-oss-20b...'); \
+    snapshot_download( \
     repo_id='openai/gpt-oss-20b', \
     cache_dir='/app/cache', \
     revision='main' \
-); \
-print('Model downloaded successfully!')"
+    ); \
+    print('Model downloaded successfully!')"
 
 # Copy main application
 COPY main.py .

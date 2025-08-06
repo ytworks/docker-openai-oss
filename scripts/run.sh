@@ -6,6 +6,8 @@ set -e
 
 # Configuration
 IMAGE_NAME="gpt-oss-cli"
+# Cache directory on host
+HOST_CACHE_DIR="${HOME}/.cache/huggingface"
 
 echo "Docker GPT-OSS CLI"
 echo "=================="
@@ -23,6 +25,12 @@ if ! docker image inspect ${IMAGE_NAME} &> /dev/null; then
     "$(dirname "$0")/build.sh"
 fi
 
-# Run container
+# Create cache directory if it doesn't exist
+mkdir -p "${HOST_CACHE_DIR}"
+
+# Run container with volume mount
 echo "Starting container..."
-docker run --gpus all -it --rm ${IMAGE_NAME}
+echo "Cache directory: ${HOST_CACHE_DIR}"
+docker run --gpus all -it --rm \
+    -v "${HOST_CACHE_DIR}:/app/cache" \
+    ${IMAGE_NAME}

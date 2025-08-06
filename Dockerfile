@@ -34,9 +34,11 @@ RUN python3.11 -c "from transformers import AutoModelForCausalLM, AutoTokenizer;
     print('Downloading model...'); \
     model = AutoModelForCausalLM.from_pretrained('openai/gpt-oss-20b', \
         cache_dir='/app/cache', \
-        torch_dtype='auto'); \
+        torch_dtype='auto', \
+        trust_remote_code=True); \
     tokenizer = AutoTokenizer.from_pretrained('openai/gpt-oss-20b', \
-        cache_dir='/app/cache'); \
+        cache_dir='/app/cache', \
+        trust_remote_code=True); \
     print('Model downloaded successfully!')"
 
 # Copy main application

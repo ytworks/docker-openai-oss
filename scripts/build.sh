@@ -17,8 +17,12 @@ if ! docker info &> /dev/null; then
     exit 1
 fi
 
+# Clean up dangling images
+echo "Cleaning up dangling images..."
+docker rmi $(docker images -f "dangling=true" -q) -f 2>/dev/null || true
+
+echo ""
 echo "Building Docker image..."
-echo "Note: First build downloads ~40GB model (may take time)"
 echo ""
 
 # Get project root directory (parent of scripts)

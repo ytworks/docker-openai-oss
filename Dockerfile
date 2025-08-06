@@ -27,18 +27,16 @@ RUN mkdir -p /app/cache
 ENV HF_HOME=/app/cache
 
 # Download model during build using huggingface_hub
-RUN python3 -c "
-from huggingface_hub import snapshot_download
-import os
-os.environ['HF_HOME'] = '/app/cache'
-print('Downloading model openai/gpt-oss-20b...')
-snapshot_download(
-    repo_id='openai/gpt-oss-20b',
-    cache_dir='/app/cache',
-    revision='main'
-)
-print('Model downloaded successfully!')
-"
+RUN python3 -c "from huggingface_hub import snapshot_download; \
+import os; \
+os.environ['HF_HOME'] = '/app/cache'; \
+print('Downloading model openai/gpt-oss-20b...'); \
+snapshot_download( \
+    repo_id='openai/gpt-oss-20b', \
+    cache_dir='/app/cache', \
+    revision='main' \
+); \
+print('Model downloaded successfully!')"
 
 # Copy main application
 COPY main.py .

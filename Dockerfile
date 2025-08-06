@@ -25,7 +25,6 @@ RUN mkdir -p /app/cache
 
 # Set Hugging Face cache directory
 ENV HF_HOME=/app/cache
-ENV TRANSFORMERS_CACHE=/app/cache
 
 # Skip model download during build - will download on first run
 RUN echo "Model will be downloaded on first run"
@@ -42,7 +41,6 @@ USER appuser
 
 # Environment variables
 ENV PYTHONUNBUFFERED=1
-ENV MODEL_CACHE_DIR=/app/cache
 ENV CUDA_VISIBLE_DEVICES=0
 
 # Entry point

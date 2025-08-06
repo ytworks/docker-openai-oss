@@ -1,36 +1,30 @@
 FROM nvidia/cuda:12.6.2-runtime-ubuntu22.04
 
-# Install Python and system dependencies
+# Install system dependencies
 RUN apt-get update && apt-get install -y \
-    python3.11 \
-    python3.11-dev \
-    python3.11-venv \
-    python3.11-distutils \
-    curl \
+    python3 \
+    python3-pip \
     git \
     && rm -rf /var/lib/apt/lists/*
-
-# Install pip for Python 3.11
-RUN curl -sS https://bootstrap.pypa.io/get-pip.py | python3.11
 
 # Set working directory
 WORKDIR /app
 
 # Install Python dependencies
 # Install PyTorch 2.8.0 with CUDA 12.8
-RUN python3.11 -m pip install torch==2.8.0 --index-url https://download.pytorch.org/whl/test/cu128
+RUN pip3 install torch==2.8.0 --index-url https://download.pytorch.org/whl/test/cu128
 
 # Install triton kernels for mxfp4 support
-RUN python3.11 -m pip install git+https://github.com/triton-lang/triton.git@main#subdirectory=python/triton_kernels
+RUN pip3 install git+https://github.com/triton-lang/triton.git@main#subdirectory=python/triton_kernels
 
 # Install other dependencies
-RUN python3.11 -m pip install transformers>=4.46.3 accelerate>=1.2.1 safetensors>=0.4.5
+RUN pip3 install transformers>=4.46.3 accelerate>=1.2.1 safetensors>=0.4.5
 
 # Create cache directory
 RUN mkdir -p /app/cache
 
 # Download model during build
-RUN python3.11 -c "from transformers import AutoModelForCausalLM, AutoTokenizer; \
+RUN python3 -c "from transformers import AutoModelForCausalLM, AutoTokenizer; \
     print('Downloading model...'); \
     model = AutoModelForCausalLM.from_pretrained('openai/gpt-oss-20b', \
         cache_dir='/app/cache', \
@@ -57,4 +51,4 @@ ENV MODEL_CACHE_DIR=/app/cache
 ENV CUDA_VISIBLE_DEVICES=0
 
 # Entry point
-CMD ["python3.11", "main.py"]
+CMD ["python3", "main.py"]

@@ -2,7 +2,7 @@
 name = "docker-openai-oss"
 version = "0.1.0"
 description = "Dockerized GPT-OSS CLI with MXFP4 quantization"
-requires-python = ">=3.11"
+requires-python = ">=3.10"
 
 dependencies = [
     "torch>=2.8.0",

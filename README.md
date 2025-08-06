@@ -91,7 +91,7 @@ Goodbye!
 ## 技術仕様
 
 - **モデル**: openai/gpt-oss-20b
-- **Python**: 3.11
+- **Python**: 3.10 (Ubuntu 22.04 default)
 - **主要ライブラリ**:
   - PyTorch 2.8.0 (test版)
   - Transformers 4.46.3

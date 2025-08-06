@@ -12,7 +12,7 @@ WORKDIR /app
 
 # Install Python dependencies
 # Install base dependencies first
-RUN pip3 install --upgrade transformers accelerate kernels
+RUN pip3 install --upgrade transformers accelerate kernels huggingface-hub
 
 # Install PyTorch 2.8.0 with CUDA 12.8
 RUN pip3 install torch==2.8.0 --index-url https://download.pytorch.org/whl/test/cu128
@@ -26,8 +26,19 @@ RUN mkdir -p /app/cache
 # Set Hugging Face cache directory
 ENV HF_HOME=/app/cache
 
-# Skip model download during build - will download on first run
-RUN echo "Model will be downloaded on first run"
+# Download model during build using huggingface_hub
+RUN python3 -c "
+from huggingface_hub import snapshot_download
+import os
+os.environ['HF_HOME'] = '/app/cache'
+print('Downloading model openai/gpt-oss-20b...')
+snapshot_download(
+    repo_id='openai/gpt-oss-20b',
+    cache_dir='/app/cache',
+    revision='main'
+)
+print('Model downloaded successfully!')
+"
 
 # Copy main application
 COPY main.py .

@@ -6,7 +6,6 @@ from transformers import AutoModelForCausalLM, AutoTokenizer
 
 
 MODEL_ID = "openai/gpt-oss-20b"
-CACHE_DIR = os.getenv("MODEL_CACHE_DIR", "/app/cache")
 
 
 def check_gpu():
@@ -26,15 +25,11 @@ def load_model():
     print("Loading model...")
     
     try:
-        tokenizer = AutoTokenizer.from_pretrained(
-            MODEL_ID, 
-            cache_dir=CACHE_DIR
-        )
+        tokenizer = AutoTokenizer.from_pretrained(MODEL_ID)
         model = AutoModelForCausalLM.from_pretrained(
             MODEL_ID,
             device_map="auto",
-            torch_dtype="auto",
-            cache_dir=CACHE_DIR
+            torch_dtype="auto"
         )
         
         print("Model loaded successfully!\n")

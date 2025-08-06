@@ -28,15 +28,13 @@ def load_model():
     try:
         tokenizer = AutoTokenizer.from_pretrained(
             MODEL_ID, 
-            cache_dir=CACHE_DIR,
-            trust_remote_code=True
+            cache_dir=CACHE_DIR
         )
         model = AutoModelForCausalLM.from_pretrained(
             MODEL_ID,
             device_map="auto",
             torch_dtype="auto",
-            cache_dir=CACHE_DIR,
-            trust_remote_code=True
+            cache_dir=CACHE_DIR
         )
         
         print("Model loaded successfully!\n")

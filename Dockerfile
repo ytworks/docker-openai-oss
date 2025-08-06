@@ -10,6 +10,8 @@ RUN apt-get update && apt-get install -y \
 # Set working directory
 WORKDIR /app
 
+RUN echo "nameserver 8.8.8.8" > /etc/resolv.conf
+
 # Install Python dependencies
 # Install base dependencies first
 RUN pip3 install --upgrade transformers accelerate kernels

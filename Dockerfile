@@ -20,7 +20,7 @@ RUN pip3 install torch==2.8.0 --index-url https://download.pytorch.org/whl/test/
 # Install triton kernels for mxfp4 support (last)
 RUN pip3 install git+https://github.com/triton-lang/triton.git@main#subdirectory=python/triton_kernels
 
-RUN pip3 install --force-reinstall -v "hf_xet==1.1.3"
+RUN pip3 install --force-reinstall -v "hf_xet==1.1.4-rc3"
 # Create cache directory
 RUN mkdir -p /app/cache
 

@@ -6,8 +6,10 @@ set -e
 
 # Configuration
 IMAGE_NAME="gpt-oss-cli"
-# Cache directory on host
-HOST_CACHE_DIR="${HOME}/.cache/huggingface"
+# Cache directory on host - use project's cache directory
+SCRIPT_DIR="$(dirname "$(realpath "$0")")"
+PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
+HOST_CACHE_DIR="${PROJECT_ROOT}/cache"
 
 echo "Docker GPT-OSS CLI"
 echo "=================="

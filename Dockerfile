@@ -1,8 +1,5 @@
 FROM nvidia/cuda:12.8.1-cudnn-runtime-ubuntu22.04
 
-# Set DNS for build
-RUN echo "nameserver 8.8.8.8" > /etc/resolv.conf
-
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
     python3 \

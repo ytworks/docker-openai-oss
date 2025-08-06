@@ -28,8 +28,8 @@ echo ""
 # Get project root directory (parent of scripts)
 PROJECT_ROOT="$(dirname "$(dirname "$(realpath "$0")")")"
 
-# Build image from project root with host network
-docker build --network host -t ${IMAGE_NAME} "${PROJECT_ROOT}"
+# Build image from project root
+docker build -t ${IMAGE_NAME} "${PROJECT_ROOT}"
 
 echo ""
 echo "Build completed!"

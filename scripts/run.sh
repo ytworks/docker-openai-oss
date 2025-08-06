@@ -30,9 +30,11 @@ fi
 # Create cache directory if it doesn't exist
 mkdir -p "${HOST_CACHE_DIR}"
 
-# Run container with volume mount
+# Run container with volume mount and DNS settings
 echo "Starting container..."
 echo "Cache directory: ${HOST_CACHE_DIR}"
 docker run --gpus all -it --rm \
+    --dns 8.8.8.8 \
+    --dns 8.8.4.4 \
     -v "${HOST_CACHE_DIR}:/app/cache" \
     ${IMAGE_NAME}

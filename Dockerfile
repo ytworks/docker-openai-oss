@@ -23,17 +23,12 @@ RUN pip3 install transformers>=4.46.3 accelerate>=1.2.1 safetensors>=0.4.5
 # Create cache directory
 RUN mkdir -p /app/cache
 
-# Download model during build
-RUN python3 -c "from transformers import AutoModelForCausalLM, AutoTokenizer; \
-    print('Downloading model...'); \
-    model = AutoModelForCausalLM.from_pretrained('openai/gpt-oss-20b', \
-        cache_dir='/app/cache', \
-        torch_dtype='auto', \
-        trust_remote_code=True); \
-    tokenizer = AutoTokenizer.from_pretrained('openai/gpt-oss-20b', \
-        cache_dir='/app/cache', \
-        trust_remote_code=True); \
-    print('Model downloaded successfully!')"
+# Set Hugging Face cache directory
+ENV HF_HOME=/app/cache
+ENV TRANSFORMERS_CACHE=/app/cache
+
+# Skip model download during build - will download on first run
+RUN echo "Model will be downloaded on first run"
 
 # Copy main application
 COPY main.py .

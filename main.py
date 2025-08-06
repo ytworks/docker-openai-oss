@@ -25,16 +25,27 @@ def load_model():
     """Load model and tokenizer"""
     print("Loading model...")
     
-    tokenizer = AutoTokenizer.from_pretrained(MODEL_ID, cache_dir=CACHE_DIR)
-    model = AutoModelForCausalLM.from_pretrained(
-        MODEL_ID,
-        device_map="auto",
-        torch_dtype="auto",
-        cache_dir=CACHE_DIR
-    )
-    
-    print("Model loaded successfully!\n")
-    return model, tokenizer
+    try:
+        tokenizer = AutoTokenizer.from_pretrained(
+            MODEL_ID, 
+            cache_dir=CACHE_DIR,
+            trust_remote_code=True
+        )
+        model = AutoModelForCausalLM.from_pretrained(
+            MODEL_ID,
+            device_map="auto",
+            torch_dtype="auto",
+            cache_dir=CACHE_DIR,
+            trust_remote_code=True
+        )
+        
+        print("Model loaded successfully!\n")
+        return model, tokenizer
+    except Exception as e:
+        print(f"Error loading model: {e}")
+        print("\nNote: This may be due to the model being large (~40GB).")
+        print("Please ensure you have enough disk space and memory.")
+        sys.exit(1)
 
 
 def chat_loop(model, tokenizer):

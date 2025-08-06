@@ -11,14 +11,14 @@ RUN apt-get update && apt-get install -y \
 WORKDIR /app
 
 # Install Python dependencies
+# Install base dependencies first
+RUN pip3 install --upgrade transformers>=4.46.3 accelerate>=1.2.1 kernels
+
 # Install PyTorch 2.8.0 with CUDA 12.8
 RUN pip3 install torch==2.8.0 --index-url https://download.pytorch.org/whl/test/cu128
 
-# Install triton kernels for mxfp4 support
+# Install triton kernels for mxfp4 support (last)
 RUN pip3 install git+https://github.com/triton-lang/triton.git@main#subdirectory=python/triton_kernels
-
-# Install other dependencies
-RUN pip3 install transformers>=4.46.3 accelerate>=1.2.1 safetensors>=0.4.5
 
 # Create cache directory
 RUN mkdir -p /app/cache

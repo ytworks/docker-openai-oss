@@ -8,7 +8,7 @@ dependencies = [
     "torch>=2.8.0",
     "transformers>=4.46.3",
     "accelerate>=1.2.1",
-    "safetensors>=0.4.5",
+    "kernels",
 ]
 
 [build-system]

@@ -58,7 +58,7 @@ docker build -t gpt-oss-cli .
 docker run --gpus all -it gpt-oss-cli
 ```
 
-**注意**: 初回ビルド時にモデル（約40GB）がダウンロードされるため、時間がかかります。
+**注意**: 初回実行時にモデル（約40GB）がダウンロードされるため、時間がかかります。十分なディスク容量を確保してください。
 
 ## 使用方法
 
@@ -93,10 +93,12 @@ Goodbye!
 - **モデル**: openai/gpt-oss-20b
 - **Python**: 3.10 (Ubuntu 22.04 default)
 - **主要ライブラリ**:
-  - PyTorch 2.8.0 (test版)
-  - Transformers 4.46.3
+  - PyTorch 2.8.0 (test版, CUDA 12.8)
+  - Transformers 4.46.3+
+  - Accelerate 1.2.1+
+  - Kernels
   - Triton Kernels (MXFP4サポート)
-- **CUDA**: 12.6.2
+- **CUDA**: 12.6.2 (ベースイメージ)
 
 ## トラブルシューティング
 

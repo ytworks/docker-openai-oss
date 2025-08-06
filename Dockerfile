@@ -21,6 +21,9 @@ RUN pip3 install torch==2.8.0 --index-url https://download.pytorch.org/whl/test/
 RUN pip3 install git+https://github.com/triton-lang/triton.git@main#subdirectory=python/triton_kernels
 
 RUN pip3 install --force-reinstall -v "hf_xet==1.1.4-rc3"
+RUN ulimit -Sn 4096
+ENV HF_XET_MAX_CONCURRENT_DOWNLOADS=2
+
 # Create cache directory
 RUN mkdir -p /app/cache
 

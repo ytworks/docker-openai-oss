@@ -93,10 +93,10 @@ Goodbye!
 - **モデル**: openai/gpt-oss-20b
 - **Python**: 3.11
 - **主要ライブラリ**:
-  - PyTorch 2.7.0
+  - PyTorch 2.8.0 (test版)
   - Transformers 4.46.3
-  - Triton 3.4.0
-- **CUDA**: 12.6.2
+  - Triton Kernels (MXFP4サポート)
+- **CUDA**: 12.6.2 + cuDNN
 
 ## トラブルシューティング
 

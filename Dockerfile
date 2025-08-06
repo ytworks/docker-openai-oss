@@ -1,4 +1,4 @@
-FROM nvidia/cuda:12.1.0-runtime-ubuntu22.04
+FROM nvidia/cuda:12.6.2-cudnn9-runtime-ubuntu22.04
 
 # Install Python and system dependencies
 RUN apt-get update && apt-get install -y \
@@ -17,11 +17,11 @@ RUN curl -sS https://bootstrap.pypa.io/get-pip.py | python3.11
 WORKDIR /app
 
 # Install Python dependencies
-# Install PyTorch 2.7.0 with CUDA 12.1
-RUN python3.11 -m pip install torch==2.7.0 torchvision==0.20.0 --index-url https://download.pytorch.org/whl/cu121
+# Install PyTorch 2.8.0 with CUDA 12.8
+RUN python3.11 -m pip install torch==2.8.0 --index-url https://download.pytorch.org/whl/test/cu128
 
-# Install Triton 3.4.0 separately to override PyTorch's dependency
-RUN python3.11 -m pip install --upgrade triton==3.4.0
+# Install triton kernels for mxfp4 support
+RUN python3.11 -m pip install git+https://github.com/triton-lang/triton.git@main#subdirectory=python/triton_kernels
 
 # Install other dependencies
 RUN python3.11 -m pip install transformers>=4.46.3 accelerate>=1.2.1 safetensors>=0.4.5

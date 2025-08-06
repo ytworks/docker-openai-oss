@@ -1,25 +1,30 @@
-FROM nvidia/cuda:12.6.2-runtime-ubuntu22.04
+FROM nvidia/cuda:12.1.0-runtime-ubuntu22.04
 
 # Install Python and system dependencies
 RUN apt-get update && apt-get install -y \
     python3.11 \
     python3.11-dev \
-    python3-pip \
+    python3.11-venv \
+    python3.11-distutils \
     curl \
     git \
     && rm -rf /var/lib/apt/lists/*
 
-# Install uv
-RUN pip3 install uv
+# Install pip for Python 3.11
+RUN curl -sS https://bootstrap.pypa.io/get-pip.py | python3.11
 
 # Set working directory
 WORKDIR /app
 
-# Copy project files
-COPY pyproject.toml .
-
 # Install Python dependencies
-RUN uv pip install --system --no-cache -r pyproject.toml
+# Install PyTorch 2.7.0 with CUDA 12.1
+RUN python3.11 -m pip install torch==2.7.0 torchvision==0.20.0 --index-url https://download.pytorch.org/whl/cu121
+
+# Install Triton 3.4.0 separately to override PyTorch's dependency
+RUN python3.11 -m pip install --upgrade triton==3.4.0
+
+# Install other dependencies
+RUN python3.11 -m pip install transformers>=4.46.3 accelerate>=1.2.1 safetensors>=0.4.5
 
 # Create cache directory
 RUN mkdir -p /app/cache

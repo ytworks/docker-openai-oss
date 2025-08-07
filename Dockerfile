@@ -23,6 +23,7 @@ ENV HF_HOME=/app/cache
 RUN echo $HF_HUB_DOWNLOAD_TIMEOUT
 ENV HF_HUB_DOWNLOAD_TIMEOUT=180
 RUN echo $HF_HUB_DOWNLOAD_TIMEOUT
+RUN pip list
 
 # Create cache directory
 RUN mkdir -p /app/cache

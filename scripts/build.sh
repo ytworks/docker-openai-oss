@@ -29,7 +29,7 @@ echo ""
 PROJECT_ROOT="$(dirname "$(dirname "$(realpath "$0")")")"
 
 # Build image from project root
-docker build --network host --progress=plain -t ${IMAGE_NAME} "${PROJECT_ROOT}"
+docker build --network host -t ${IMAGE_NAME} "${PROJECT_ROOT}"
 
 echo ""
 echo "Build completed!"

@@ -12,7 +12,7 @@ WORKDIR /app
 
 # Install Python dependencies
 # Install base dependencies first
-RUN pip3 install --upgrade transformers accelerate kernels huggingface-hub
+RUN pip3 install --upgrade transformers accelerate kernels "huggingface-hub[cli]"
 
 # Install PyTorch 2.8.0 with CUDA 12.8
 RUN pip3 install torch==2.8.0 --index-url https://download.pytorch.org/whl/test/cu128
@@ -20,24 +20,13 @@ RUN pip3 install torch==2.8.0 --index-url https://download.pytorch.org/whl/test/
 # Install triton kernels for mxfp4 support (last)
 RUN pip3 install git+https://github.com/triton-lang/triton.git@main#subdirectory=python/triton_kernels
 ENV HF_HOME=/app/cache
-RUN pip list
 
 # Create cache directory
 RUN mkdir -p /app/cache
 
 
 
-# Download model during build using huggingface_hub
-RUN python3 -c "from huggingface_hub import snapshot_download; \
-    import os; \
-    os.environ['HF_HOME'] = '/app/cache'; \
-    print('Downloading model openai/gpt-oss-20b...'); \
-    snapshot_download( \
-    repo_id='openai/gpt-oss-20b', \
-    cache_dir='/app/cache', \
-    revision='main' \
-    ); \
-    print('Model downloaded successfully!')"
+# Model will be downloaded separately after build
 
 # Copy main application
 COPY main.py .

@@ -20,14 +20,11 @@ RUN pip3 install torch==2.8.0 --index-url https://download.pytorch.org/whl/test/
 # Install triton kernels for mxfp4 support (last)
 RUN pip3 install git+https://github.com/triton-lang/triton.git@main#subdirectory=python/triton_kernels
 ENV HF_HOME=/app/cache
-RUN pip3 install --force-reinstall -v "hf_xet==1.1.4-rc3"
-RUN ulimit -Sn 4096
-ENV HF_XET_MAX_CONCURRENT_DOWNLOADS=2
+
 
 # Create cache directory
 RUN mkdir -p /app/cache
 
-# Set Hugging Face cache directory
 
 
 # Download model during build using huggingface_hub

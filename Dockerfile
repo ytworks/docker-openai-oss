@@ -14,9 +14,10 @@ WORKDIR /app
 # Install base dependencies first
 RUN pip install -U git+https://github.com/Tsumugii24/transformers
 RUN pip install -U accelerate kernels
-RUN pip install torch==2.8.0 --index-url https://download.pytorch.org/whl/test/cu128
 RUN pip install -U triton==3.4
 RUN pip install -U "huggingface_hub[cli]"
+RUN pip install torch==2.8.0 --index-url https://download.pytorch.org/whl/test/cu128
+
 # Install Triton kernels from GitHub
 # Note: This is necessary for the Triton kernels to be available in the environment
 # The subdirectory is specified to point to the correct location of the Triton kernels

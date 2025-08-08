@@ -31,11 +31,12 @@ def load_model():
     try:
         if os.path.exists(local_model_path):
             print(f"Loading from local path: {local_model_path}", flush=True)
-            tokenizer = AutoTokenizer.from_pretrained(local_model_path)
+            tokenizer = AutoTokenizer.from_pretrained(local_model_path, local_files_only=True)
             model = AutoModelForCausalLM.from_pretrained(
                 local_model_path,
                 device_map="auto",
-                torch_dtype="auto"
+                torch_dtype="auto",
+                local_files_only=True
             )
         else:
             print(f"Local model not found at {local_model_path}", flush=True)

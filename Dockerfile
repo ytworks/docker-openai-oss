@@ -12,7 +12,7 @@ WORKDIR /app
 
 # Install Python dependencies
 # Install base dependencies first
-RUN pip3 install --upgrade transformers torch triton accelerate kernels
+RUN pip install -U transformers accelerate torch triton kernels
 RUN pip install -U "huggingface_hub[cli]"
 # Install Triton kernels from GitHub
 # Note: This is necessary for the Triton kernels to be available in the environment

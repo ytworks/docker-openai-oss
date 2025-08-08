@@ -97,11 +97,9 @@ def chat_loop(model, tokenizer):
                 
                 generated = model.generate(
                     **inputs,
-                    max_new_tokens=2048,
+                    max_new_tokens=256,
                     temperature=0.8,
                     do_sample=True,
-                    top_p=0.95,
-                    repetition_penalty=1.1,
                     pad_token_id=tokenizer.pad_token_id,
                     eos_token_id=tokenizer.eos_token_id,
                     use_cache=False  # Disable KV cache to avoid triton kernel issues

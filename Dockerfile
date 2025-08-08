@@ -23,6 +23,7 @@ ENV HF_HOME=/app/cache
 
 # Create cache directory
 RUN mkdir -p /app/cache
+RUN pip list
 
 
 

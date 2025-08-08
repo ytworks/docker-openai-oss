@@ -38,5 +38,4 @@ docker run --gpus all -it --rm \
     --dns 8.8.8.8 \
     --dns 8.8.4.4 \
     -v "${HOST_CACHE_DIR}:/app/cache" \
-    -e PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True \
     ${IMAGE_NAME}

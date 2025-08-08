@@ -98,19 +98,20 @@ def chat_loop(model, tokenizer):
             
             for chunk_num in range(max_chunks):
                 # Generate next chunk
-                outputs = model.generate(
-                    **current_inputs,
-                    max_new_tokens=256,
-                    temperature=0.8,
-                    use_cache=True,
-                    do_sample=True,
-                    top_p=0.95,
-                    repetition_penalty=1.1,
-                    pad_token_id=tokenizer.pad_token_id,
-                    eos_token_id=tokenizer.eos_token_id,
-                    return_dict_in_generate=True,
-                    output_scores=False
-                )
+                with torch.inference_mode():
+                    outputs = model.generate(
+                        **current_inputs,
+                        max_new_tokens=256,
+                        temperature=0.8,
+                        do_sample=True,
+                        top_p=0.95,
+                        repetition_penalty=1.1,
+                        pad_token_id=tokenizer.pad_token_id or tokenizer.eos_token_id,
+                        eos_token_id=tokenizer.eos_token_id,
+                        return_dict_in_generate=True,
+                        output_scores=False,
+                        use_cache=False  # Disable KV cache to avoid triton kernel issues
+                    )
                 
                 # Extract generated tokens (excluding the input)
                 input_length = current_inputs["input_ids"].shape[-1]

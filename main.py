@@ -89,17 +89,23 @@ def chat_loop(model, tokenizer):
                 return_dict=True,
             ).to(model.device)
             
-            # Generate response
-            generated = model.generate(
-                **inputs,
-                max_new_tokens=2048,
-                temperature=0.8,
-                do_sample=True,
-                top_p=0.95,
-                repetition_penalty=1.1,
-                pad_token_id=tokenizer.pad_token_id,
-                eos_token_id=tokenizer.eos_token_id
-            )
+            # Generate response with inference mode
+            with torch.inference_mode():
+                # Clear CUDA cache before generation to avoid cache issues
+                if torch.cuda.is_available():
+                    torch.cuda.empty_cache()
+                
+                generated = model.generate(
+                    **inputs,
+                    max_new_tokens=2048,
+                    temperature=0.8,
+                    do_sample=True,
+                    top_p=0.95,
+                    repetition_penalty=1.1,
+                    pad_token_id=tokenizer.pad_token_id,
+                    eos_token_id=tokenizer.eos_token_id,
+                    use_cache=False  # Disable KV cache to avoid triton kernel issues
+                )
             
             # Decode response
             response = tokenizer.decode(generated[0][inputs["input_ids"].shape[-1]:], skip_special_tokens=True)

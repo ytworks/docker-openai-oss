@@ -163,7 +163,10 @@ def chat_loop(model, tokenizer):
             print("\nError: GPU out of memory. Try reducing message history.")
             messages = messages[-2:]  # Keep only last exchange
         except Exception as e:
-            print(f"\nError: {str(e)}\n")
+            print(f"\nError: {type(e).__name__}: {str(e)}")
+            print(f"Error details: {repr(e)}")
+            import traceback
+            print(f"Traceback:\n{traceback.format_exc()}")
 
 
 def main():
@@ -182,7 +185,10 @@ def main():
         chat_loop(model, tokenizer)
         
     except Exception as e:
-        print(f"\nFatal error: {str(e)}")
+        print(f"\nFatal error: {type(e).__name__}: {str(e)}")
+        print(f"Error details: {repr(e)}")
+        import traceback
+        print(f"Traceback:\n{traceback.format_exc()}")
         sys.exit(1)
 
 

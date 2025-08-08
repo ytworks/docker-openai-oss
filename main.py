@@ -22,7 +22,7 @@ def check_gpu():
 
 def load_model():
     """Load model and tokenizer"""
-    print("Loading model...")
+    print("Loading model...", flush=True)
     
     # Check for local model first
     local_model_path = f"/app/cache/models/{MODEL_ID}"

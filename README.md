@@ -11,8 +11,13 @@ Dockerコンテナ内で動作するGPT-OSSモデル（openai/gpt-oss-20b）のC
 ## クイックスタート
 
 ```bash
-# ビルドと実行
+# 1. Dockerイメージのビルド
 ./scripts/build.sh
+
+# 2. モデルのダウンロード（初回のみ、約40GB）
+./scripts/download_model.sh
+
+# 3. CLIの実行
 ./scripts/run.sh
 ```
 
@@ -41,10 +46,13 @@ cd docker-openai-oss
 #### スクリプトを使用する場合（推奨）
 
 ```bash
-# Dockerイメージのビルド
+# 1. Dockerイメージのビルド
 ./scripts/build.sh
 
-# コンテナの起動
+# 2. モデルのダウンロード（初回のみ）
+./scripts/download_model.sh
+
+# 3. コンテナの起動
 ./scripts/run.sh
 ```
 
@@ -59,8 +67,8 @@ docker run --gpus all -it gpt-oss-cli
 ```
 
 **注意**: 
-- 初回実行時にモデル（約40GB）がダウンロードされるため、時間がかかります
-- モデルは`~/.cache/huggingface`に保存され、再利用されます
+- モデルのダウンロードは別途`./scripts/download_model.sh`で実行します（約40GB）
+- モデルはプロジェクトの`cache`ディレクトリに保存され、再利用されます
 - 十分なディスク容量を確保してください
 
 ## 使用方法
@@ -136,7 +144,14 @@ Error: GPU out of memory. Try reducing message history.
 - コンテナの起動を実行
 - イメージが存在しない場合は自動でビルド
 - GPUの自動検出と設定
-- モデルキャッシュをホスト（`~/.cache/huggingface`）と共有
+- モデルキャッシュをプロジェクトの`cache`ディレクトリと共有
+- DNS設定（8.8.8.8）でネットワーク問題を回避
+
+### scripts/download_model.sh
+- Hugging Faceからモデルをダウンロード
+- `huggingface-cli`を使用してモデルファイルを取得
+- プロジェクトの`cache`ディレクトリに保存
+- 初回のみ実行が必要（約40GB）
 
 ## ライセンス
 

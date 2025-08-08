@@ -24,13 +24,27 @@ def load_model():
     """Load model and tokenizer"""
     print("Loading model...")
     
+    # Check for local model first
+    local_model_path = f"/app/cache/models/{MODEL_ID}"
+    
     try:
-        tokenizer = AutoTokenizer.from_pretrained(MODEL_ID)
-        model = AutoModelForCausalLM.from_pretrained(
-            MODEL_ID,
-            device_map="auto",
-            torch_dtype="auto"
-        )
+        if os.path.exists(local_model_path):
+            print(f"Loading from local path: {local_model_path}")
+            tokenizer = AutoTokenizer.from_pretrained(local_model_path)
+            model = AutoModelForCausalLM.from_pretrained(
+                local_model_path,
+                device_map="auto",
+                torch_dtype="auto"
+            )
+        else:
+            print(f"Local model not found at {local_model_path}")
+            print("Attempting to download from Hugging Face...")
+            tokenizer = AutoTokenizer.from_pretrained(MODEL_ID)
+            model = AutoModelForCausalLM.from_pretrained(
+                MODEL_ID,
+                device_map="auto",
+                torch_dtype="auto"
+            )
         
         print("Model loaded successfully!\n")
         return model, tokenizer
@@ -38,6 +52,7 @@ def load_model():
         print(f"Error loading model: {e}")
         print("\nNote: This may be due to the model being large (~40GB).")
         print("Please ensure you have enough disk space and memory.")
+        print("Try running ./scripts/download_model.sh first.")
         sys.exit(1)
 
 

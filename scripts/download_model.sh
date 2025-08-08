@@ -42,8 +42,7 @@ docker run --rm \
     -v "${HOST_CACHE_DIR}:/app/cache" \
     -e HF_HOME=/app/cache \
     ${IMAGE_NAME} \
-    huggingface-cli download ${MODEL_ID} \
-    --cache-dir /app/cache \
+    hf download ${MODEL_ID} \
     --local-dir /app/cache/models/${MODEL_ID}
 
 echo ""

@@ -28,7 +28,7 @@ ENV HF_HOME=/app/cache
 RUN mkdir -p /app/cache
 RUN pip list
 
-
+ENV TRITON_ALWAYS_COMPILE=1
 
 # Model will be downloaded separately after build
 

@@ -89,64 +89,23 @@ def chat_loop(model, tokenizer):
                 return_dict=True,
             ).to(model.device)
             
-            # Generate response in chunks until EOS is found
-            full_response = ""
-            max_chunks = 8  # Maximum 8 chunks of 256 tokens
+            # Generate response
+            generated = model.generate(
+                **inputs,
+                max_new_tokens=2048,
+                temperature=0.8,
+                do_sample=True,
+                top_p=0.95,
+                repetition_penalty=1.1,
+                pad_token_id=tokenizer.pad_token_id,
+                eos_token_id=tokenizer.eos_token_id
+            )
             
-            # Start with the original input
-            current_inputs = inputs
-            
-            for chunk_num in range(max_chunks):
-                # Generate next chunk
-                with torch.inference_mode():
-                    outputs = model.generate(
-                        **current_inputs,
-                        max_new_tokens=256,
-                        temperature=0.8,
-                        do_sample=True,
-                        top_p=0.95,
-                        repetition_penalty=1.1,
-                        pad_token_id=tokenizer.pad_token_id or tokenizer.eos_token_id,
-                        eos_token_id=tokenizer.eos_token_id,
-                        return_dict_in_generate=True,
-                        output_scores=False,
-                        use_cache=False  # Disable KV cache to avoid triton kernel issues
-                    )
-                
-                # Extract generated tokens (excluding the input)
-                input_length = current_inputs["input_ids"].shape[-1]
-                generated_ids = outputs.sequences[0][input_length:]
-                
-                # Decode the chunk
-                chunk_text = tokenizer.decode(generated_ids, skip_special_tokens=True)
-                
-                # Check if EOS token was generated
-                if tokenizer.eos_token_id in generated_ids:
-                    # Find position of EOS token
-                    eos_positions = (generated_ids == tokenizer.eos_token_id).nonzero(as_tuple=True)[0]
-                    if len(eos_positions) > 0:
-                        # Decode only up to the first EOS token
-                        text_before_eos = tokenizer.decode(generated_ids[:eos_positions[0]], skip_special_tokens=True)
-                        full_response += text_before_eos
-                        break
-                
-                # Add chunk to response
-                full_response += chunk_text
-                
-                # If we haven't found EOS and not at max chunks, prepare for next iteration
-                if chunk_num < max_chunks - 1:
-                    # Concatenate the generated sequence with the original input
-                    new_input_ids = outputs.sequences
-                    new_attention_mask = torch.ones_like(new_input_ids)
-                    
-                    # Create new inputs for next iteration
-                    current_inputs = {
-                        "input_ids": new_input_ids,
-                        "attention_mask": new_attention_mask
-                    }
+            # Decode response
+            response = tokenizer.decode(generated[0][inputs["input_ids"].shape[-1]:], skip_special_tokens=True)
             
             # Clean up any remaining special tokens
-            response = full_response.replace("<|channel|>", "").replace("<|message|>", "").replace("<|end|>", "").strip()
+            response = response.replace("<|channel|>", "").replace("<|message|>", "").replace("<|end|>", "").strip()
             
             print(f"\n{response}\n")
             

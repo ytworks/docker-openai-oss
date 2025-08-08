@@ -33,6 +33,10 @@ mkdir -p "${HOST_CACHE_DIR}"
 # Run container with volume mount and DNS settings
 echo "Starting container..."
 echo "Cache directory: ${HOST_CACHE_DIR}"
+echo "Using Triton backend with CUDA memory optimization"
 docker run --gpus all -it --rm \
+    --dns 8.8.8.8 \
+    --dns 8.8.4.4 \
     -v "${HOST_CACHE_DIR}:/app/cache" \
+    -e PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True \
     ${IMAGE_NAME}

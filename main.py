@@ -90,7 +90,7 @@ def chat_loop(model, tokenizer):
             ).to(model.device)
             
             # Generate response
-            generated = model.generate(**inputs, max_new_tokens=256)
+            generated = model.generate(**inputs, max_new_tokens=200, do_sample=True, temperature=1.0)
             
             # Decode response
             response = tokenizer.decode(generated[0][inputs["input_ids"].shape[-1]:])

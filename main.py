@@ -42,6 +42,7 @@ def load_model():
                 local_files_only=True
             )
         else:
+            '''
             print(f"Local model not found at {local_model_path}", flush=True)
             print("Attempting to download from Hugging Face...", flush=True)
             tokenizer = AutoTokenizer.from_pretrained(MODEL_ID)
@@ -50,6 +51,9 @@ def load_model():
                 device_map="auto",
                 torch_dtype="auto"
             )
+            '''
+            print(f"Local model not found at {local_model_path}. Please run ./scripts/download_model.sh first.", flush=True)
+            sys.exit(1)
         
         print("Model loaded successfully!\n")
         return model, tokenizer

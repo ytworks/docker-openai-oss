@@ -16,8 +16,8 @@ def check_gpu():
     
     device_name = torch.cuda.get_device_name(0)
     total_memory = torch.cuda.get_device_properties(0).total_memory / 1e9
-    print(f"GPU: {device_name}")
-    print(f"Memory: {total_memory:.1f}GB\n")
+    print(f"GPU: {device_name}", flush=True)
+    print(f"Memory: {total_memory:.1f}GB\n", flush=True)
     local_model_path = f"/app/cache/models/{MODEL_ID}"
     print(f"Checking local model path: {local_model_path}", flush=True)
 

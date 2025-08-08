@@ -91,12 +91,15 @@ def chat_loop(model, tokenizer):
             
             # Generate response in chunks until EOS is found
             full_response = ""
-            max_iterations = 8  # Maximum 8 chunks of 256 tokens = 2048 tokens
-            current_input_ids = inputs["input_ids"]
+            max_chunks = 8  # Maximum 8 chunks of 256 tokens
             
-            for _ in range(max_iterations):
-                generated = model.generate(
-                    input_ids=current_input_ids,
+            # Start with the original input
+            current_inputs = inputs
+            
+            for chunk_num in range(max_chunks):
+                # Generate next chunk
+                outputs = model.generate(
+                    **current_inputs,
                     max_new_tokens=256,
                     temperature=0.8,
                     use_cache=True,
@@ -105,24 +108,41 @@ def chat_loop(model, tokenizer):
                     repetition_penalty=1.1,
                     pad_token_id=tokenizer.pad_token_id,
                     eos_token_id=tokenizer.eos_token_id,
-                    return_dict_in_generate=True
+                    return_dict_in_generate=True,
+                    output_scores=False
                 )
                 
-                # Extract new tokens
-                new_tokens = generated.sequences[0][current_input_ids.shape[-1]:]
-                chunk = tokenizer.decode(new_tokens, skip_special_tokens=False)
+                # Extract generated tokens (excluding the input)
+                input_length = current_inputs["input_ids"].shape[-1]
+                generated_ids = outputs.sequences[0][input_length:]
                 
-                # Check if EOS token is present
-                if tokenizer.eos_token_id in new_tokens:
-                    # Add everything up to EOS
-                    eos_pos = (new_tokens == tokenizer.eos_token_id).nonzero(as_tuple=True)[0][0]
-                    chunk = tokenizer.decode(new_tokens[:eos_pos], skip_special_tokens=True)
-                    full_response += chunk
-                    break
-                else:
-                    # Add the chunk and continue
-                    full_response += tokenizer.decode(new_tokens, skip_special_tokens=True)
-                    current_input_ids = generated.sequences
+                # Decode the chunk
+                chunk_text = tokenizer.decode(generated_ids, skip_special_tokens=True)
+                
+                # Check if EOS token was generated
+                if tokenizer.eos_token_id in generated_ids:
+                    # Find position of EOS token
+                    eos_positions = (generated_ids == tokenizer.eos_token_id).nonzero(as_tuple=True)[0]
+                    if len(eos_positions) > 0:
+                        # Decode only up to the first EOS token
+                        text_before_eos = tokenizer.decode(generated_ids[:eos_positions[0]], skip_special_tokens=True)
+                        full_response += text_before_eos
+                        break
+                
+                # Add chunk to response
+                full_response += chunk_text
+                
+                # If we haven't found EOS and not at max chunks, prepare for next iteration
+                if chunk_num < max_chunks - 1:
+                    # Concatenate the generated sequence with the original input
+                    new_input_ids = outputs.sequences
+                    new_attention_mask = torch.ones_like(new_input_ids)
+                    
+                    # Create new inputs for next iteration
+                    current_inputs = {
+                        "input_ids": new_input_ids,
+                        "attention_mask": new_attention_mask
+                    }
             
             # Clean up any remaining special tokens
             response = full_response.replace("<|channel|>", "").replace("<|message|>", "").replace("<|end|>", "").strip()

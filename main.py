@@ -26,11 +26,11 @@ def load_model():
     
     # Check for local model first
     local_model_path = f"/app/cache/models/{MODEL_ID}"
-    print(f"Checking local model path: {local_model_path}")
+    print(f"Checking local model path: {local_model_path}", flush=True)
     
     try:
         if os.path.exists(local_model_path):
-            print(f"Loading from local path: {local_model_path}")
+            print(f"Loading from local path: {local_model_path}", flush=True)
             tokenizer = AutoTokenizer.from_pretrained(local_model_path)
             model = AutoModelForCausalLM.from_pretrained(
                 local_model_path,
@@ -38,8 +38,8 @@ def load_model():
                 torch_dtype="auto"
             )
         else:
-            print(f"Local model not found at {local_model_path}")
-            print("Attempting to download from Hugging Face...")
+            print(f"Local model not found at {local_model_path}", flush=True)
+            print("Attempting to download from Hugging Face...", flush=True)
             tokenizer = AutoTokenizer.from_pretrained(MODEL_ID)
             model = AutoModelForCausalLM.from_pretrained(
                 MODEL_ID,

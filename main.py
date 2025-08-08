@@ -97,7 +97,6 @@ def chat_loop(model, tokenizer):
             for _ in range(max_iterations):
                 generated = model.generate(
                     input_ids=current_input_ids,
-                    attention_mask=inputs.get("attention_mask"),
                     max_new_tokens=256,
                     temperature=0.8,
                     use_cache=True,

@@ -1,0 +1,16 @@
+[project]
+name = "docker-openai-oss"
+version = "0.1.0"
+description = "Dockerized GPT-OSS CLI with MXFP4 quantization"
+requires-python = ">=3.10"
+
+dependencies = [
+    "torch>=2.8.0",
+    "transformers>=4.46.3",
+    "accelerate>=1.2.1",
+    "kernels",
+]
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"

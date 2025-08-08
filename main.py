@@ -34,7 +34,7 @@ def load_model():
             tokenizer = AutoTokenizer.from_pretrained(local_model_path)
             model = AutoModelForCausalLM.from_pretrained(
                 local_model_path,
-                device_map="cuda",
+                device_map="auto",
                 torch_dtype="auto"
             )
         else:
@@ -43,7 +43,7 @@ def load_model():
             tokenizer = AutoTokenizer.from_pretrained(MODEL_ID)
             model = AutoModelForCausalLM.from_pretrained(
                 MODEL_ID,
-                device_map="cuda",
+                device_map="auto",
                 torch_dtype="auto"
             )
         

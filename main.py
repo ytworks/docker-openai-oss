@@ -93,7 +93,10 @@ def chat_loop(model, tokenizer):
             generated = model.generate(**inputs, max_new_tokens=200, temperature=1.0)
             
             # Decode response
-            response = tokenizer.decode(generated[0][inputs["input_ids"].shape[-1]:])
+            response = tokenizer.decode(generated[0][inputs["input_ids"].shape[-1]:], skip_special_tokens=True)
+            
+            # Clean up any remaining special tokens
+            response = response.replace("<|channel|>", "").replace("<|message|>", "").replace("<|end|>", "").strip()
             
             print(f"\n{response}\n")
             

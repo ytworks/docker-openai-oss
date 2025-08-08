@@ -34,7 +34,7 @@ def load_model():
             tokenizer = AutoTokenizer.from_pretrained(local_model_path)
             model = AutoModelForCausalLM.from_pretrained(
                 local_model_path,
-                device_map="auto",
+                device_map="cuda",
                 torch_dtype="auto"
             )
         else:
@@ -43,7 +43,7 @@ def load_model():
             tokenizer = AutoTokenizer.from_pretrained(MODEL_ID)
             model = AutoModelForCausalLM.from_pretrained(
                 MODEL_ID,
-                device_map="auto",
+                device_map="cuda",
                 torch_dtype="auto"
             )
         
@@ -90,7 +90,7 @@ def chat_loop(model, tokenizer):
             ).to(model.device)
             
             # Generate response
-            generated = model.generate(**inputs, max_new_tokens=200, do_sample=True, temperature=1.0)
+            generated = model.generate(**inputs, max_new_tokens=200, temperature=1.0)
             
             # Decode response
             response = tokenizer.decode(generated[0][inputs["input_ids"].shape[-1]:])

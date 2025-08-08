@@ -12,14 +12,8 @@ WORKDIR /app
 
 # Install Python dependencies
 # Install base dependencies first
-RUN pip3 install --upgrade transformers accelerate kernels
+RUN pip3 install --upgrade transformers torch triron accelerate kernels
 RUN pip install -U "huggingface_hub[cli]"
-
-# Install PyTorch 2.8.0 with CUDA 12.8
-RUN pip3 install torch==2.8.0 --index-url https://download.pytorch.org/whl/test/cu128
-
-# Install triton kernels for mxfp4 support (last)
-RUN pip3 install --upgrade triton>=3.4.0
 # Install Triton kernels from GitHub
 # Note: This is necessary for the Triton kernels to be available in the environment
 # The subdirectory is specified to point to the correct location of the Triton kernels

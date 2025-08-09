@@ -46,5 +46,8 @@ USER appuser
 ENV PYTHONUNBUFFERED=1
 ENV CUDA_VISIBLE_DEVICES=0
 
-# Entry point
-CMD ["python3", "main.py"]
+# Expose port for API server
+EXPOSE 8000
+
+# Entry point for transformers chat API server
+CMD ["transformers", "chat", "localhost:8000", "--model-name-or-path", "/app/cache/models/openai/gpt-oss-20b"]

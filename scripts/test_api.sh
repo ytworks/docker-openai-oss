@@ -56,33 +56,13 @@ if echo "$response" | grep -q "^data: "; then
     echo "---"
     echo ""
     
-    # Extract content from streaming response
-    content=""
-    # Process each line that starts with "data: "
-    echo "$response" | while IFS= read -r line; do
-        if [[ $line == data:* ]]; then
-            # Remove "data: " prefix and trim whitespace
-            json_data=$(echo "$line" | sed 's/^data: //' | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
-            # Skip empty data lines
-            if [ -n "$json_data" ] && [ "$json_data" != "[DONE]" ]; then
-                # Extract delta content if available
-                delta_content=$(echo "$json_data" | jq -r '.choices[0].delta.content // empty' 2>/dev/null)
-                if [ -n "$delta_content" ] && [ "$delta_content" != "null" ]; then
-                    echo -n "$delta_content"
-                fi
-            fi
-        fi
-    done > /tmp/test_api_content.txt
-    content=$(cat /tmp/test_api_content.txt)
-    rm -f /tmp/test_api_content.txt
-    
+    # Extract and display content
     echo "Assistant's response:"
     echo "---"
-    if [ -n "$content" ]; then
-        echo "$content"
-    else
-        echo "(No content in response)"
-    fi
+    echo "$response" | grep "^data: " | grep -v "finish_reason" | while read line; do
+        echo "$line" | sed 's/^data: //' | jq -r '.choices[0].delta.content // empty' 2>/dev/null | tr -d '\n'
+    done
+    echo ""
     echo "---"
 elif echo "$response" | grep -q '"error"'; then
     echo "✗ API returned an error:"

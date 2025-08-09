@@ -58,20 +58,23 @@ if echo "$response" | grep -q "^data: "; then
     
     # Extract content from streaming response
     content=""
-    while IFS= read -r line; do
+    # Process each line that starts with "data: "
+    echo "$response" | while IFS= read -r line; do
         if [[ $line == data:* ]]; then
-            # Remove "data: " prefix
-            json_data="${line#data: }"
+            # Remove "data: " prefix and trim whitespace
+            json_data=$(echo "$line" | sed 's/^data: //' | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
             # Skip empty data lines
-            if [ "$json_data" != "" ] && [ "$json_data" != "[DONE]" ]; then
+            if [ -n "$json_data" ] && [ "$json_data" != "[DONE]" ]; then
                 # Extract delta content if available
                 delta_content=$(echo "$json_data" | jq -r '.choices[0].delta.content // empty' 2>/dev/null)
-                if [ -n "$delta_content" ]; then
-                    content="${content}${delta_content}"
+                if [ -n "$delta_content" ] && [ "$delta_content" != "null" ]; then
+                    echo -n "$delta_content"
                 fi
             fi
         fi
-    done <<< "$response"
+    done > /tmp/test_api_content.txt
+    content=$(cat /tmp/test_api_content.txt)
+    rm -f /tmp/test_api_content.txt
     
     echo "Assistant's response:"
     echo "---"

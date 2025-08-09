@@ -59,9 +59,9 @@ if echo "$response" | grep -q "^data: "; then
     # Extract and display content
     echo "Assistant's response:"
     echo "---"
-    # Extract all content fields and concatenate them
-    content=$(echo "$response" | grep "^data: " | grep -v "finish_reason" | sed 's/^data: //' | jq -r '.choices[0].delta.content // empty' | tr -d '\n')
-    echo "$content"
+    # Extract content using sed
+    echo "$response" | grep '"content":' | sed 's/.*"content":"\([^"]*\)".*/\1/' | tr -d '\n'
+    echo ""
     echo "---"
 elif echo "$response" | grep -q '"error"'; then
     echo "✗ API returned an error:"

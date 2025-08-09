@@ -37,9 +37,11 @@ if docker ps -a | grep -q "$CONTAINER_NAME"; then
     docker rm "$CONTAINER_NAME" 2>/dev/null || true
 fi
 
-# Build Docker image
-echo "Building Docker image..."
-docker build -t "$IMAGE_NAME" "$PROJECT_ROOT"
+# Check if image exists
+if ! docker image inspect "$IMAGE_NAME" &> /dev/null; then
+    echo "Image not found. Please run ./scripts/build.sh first"
+    exit 1
+fi
 
 # Create cache directory if it doesn't exist
 mkdir -p "${MODEL_PATH}"

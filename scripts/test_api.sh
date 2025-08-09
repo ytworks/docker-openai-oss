@@ -48,12 +48,14 @@ fi
 
 # Check if response is streaming (SSE format)
 if echo "$response" | grep -q "^data: "; then
-    echo "Received streaming response. Raw response:"
+    echo "Received streaming response."
+    echo ""
+    echo "Raw response:"
     echo "---"
     echo "$response"
     echo "---"
     echo ""
-    echo "Extracting content..."
+    
     # Extract content from streaming response
     content=""
     while IFS= read -r line; do
@@ -62,25 +64,23 @@ if echo "$response" | grep -q "^data: "; then
             json_data="${line#data: }"
             # Skip empty data lines
             if [ "$json_data" != "" ] && [ "$json_data" != "[DONE]" ]; then
-                # Debug: show JSON data
-                echo "Processing: $json_data"
                 # Extract delta content if available
                 delta_content=$(echo "$json_data" | jq -r '.choices[0].delta.content // empty' 2>/dev/null)
                 if [ -n "$delta_content" ]; then
                     content="${content}${delta_content}"
-                    echo "Found content: $delta_content"
                 fi
             fi
         fi
     done <<< "$response"
     
-    echo ""
-    echo "Final extracted content:"
+    echo "Assistant's response:"
+    echo "---"
     if [ -n "$content" ]; then
         echo "$content"
     else
         echo "(No content in response)"
     fi
+    echo "---"
 elif echo "$response" | grep -q '"error"'; then
     echo "✗ API returned an error:"
     echo "$response" | jq '.' 2>/dev/null || echo "$response"

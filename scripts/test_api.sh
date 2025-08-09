@@ -6,14 +6,35 @@ set -e
 
 # Configuration
 API_URL="http://0.0.0.0:8000"
-TEST_PROMPT="hi"
+TEST_PROMPT="hi! What is PAC1"
 
 echo "Testing Transformers Chat API..."
 echo "Endpoint: $API_URL"
 echo ""
 
-# Skip health check and proceed directly to API test
-echo "Proceeding to API test..."
+# Check available models
+echo "Checking available models..."
+models_response=$(curl -s "$API_URL/v1/models" 2>&1)
+
+if [ $? -eq 0 ]; then
+    echo "Available models:"
+    # Extract model IDs using sed
+    echo "$models_response" | grep -o '"id":"[^"]*"' | sed 's/"id":"\([^"]*\)"/  - \1/'
+    echo ""
+    
+    # Extract first model ID for use in chat request
+    model_id=$(echo "$models_response" | grep -o '"id":"[^"]*"' | head -1 | sed 's/"id":"\([^"]*\)"/\1/')
+    if [ -z "$model_id" ]; then
+        model_id="gpt-oss-20b"
+        echo "Warning: Could not extract model ID, using default: $model_id"
+    else
+        echo "Using model: $model_id"
+    fi
+else
+    echo "Warning: Could not fetch models list"
+    model_id="gpt-oss-20b"
+    echo "Using default model: $model_id"
+fi
 echo ""
 
 # Send test request

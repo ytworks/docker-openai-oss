@@ -6,7 +6,7 @@ set -e
 
 # Configuration
 API_URL="http://0.0.0.0:8000"
-TEST_PROMPT="Please explain how PAC1 receptor works in cell in detail"
+TEST_PROMPT="hi"
 
 echo "Testing Transformers Chat API..."
 echo "Endpoint: $API_URL"

@@ -5,7 +5,7 @@
 set -e
 
 # Configuration
-IMAGE_NAME="gpt-oss-api"
+IMAGE_NAME="gpt-oss-cli"
 CONTAINER_NAME="transformers-chat-server"
 SCRIPT_DIR="$(dirname "$(realpath "$0")")"
 PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"

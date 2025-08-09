@@ -24,6 +24,9 @@ RUN pip install torch==2.8.0 --index-url https://download.pytorch.org/whl/test/c
 RUN pip3 install git+https://github.com/triton-lang/triton.git@main#subdirectory=python/triton_kernels
 ENV HF_HOME=/app/cache
 
+# Install dependencies for transformers serve command
+RUN pip3 install Pillow rich transformers[serving]
+
 # Create cache directory
 RUN mkdir -p /app/cache
 RUN pip list
@@ -46,5 +49,9 @@ USER appuser
 ENV PYTHONUNBUFFERED=1
 ENV CUDA_VISIBLE_DEVICES=0
 
-# Entry point
-CMD ["python3", "main.py"]
+# Expose port for API server
+EXPOSE 8000
+
+# Entry point for transformers chat API server
+# Using serve command with force_model to use local model
+CMD ["transformers", "serve", "--host", "0.0.0.0", "--port", "8000", "--force_model", "/app/cache/models/openai/gpt-oss-20b", "--trust_remote_code"]

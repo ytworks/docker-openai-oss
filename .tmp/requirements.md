@@ -1,44 +1,41 @@
-# Docker化されたGPT OSS CLI - 要件定義書（スクリプト追加版）
+# Requirements - Transformers Chat API Server
 
-## 1. 追加要件
+## 概要
+既存のDockerfileを最小限の変更で修正し、Transformers Chat APIサーバーとして動作させる。
 
-### 1.1 ビルドスクリプト要件
-- **目的**: Dockerイメージのビルドを簡単に実行できるスクリプト
-- **機能**:
-  - Dockerイメージのビルド実行
-  - ビルド時のオプション設定（キャッシュ利用など）
-  - ビルド結果の確認
-  - エラーハンドリング
+## 機能要件
 
-### 1.2 起動スクリプト要件
-- **目的**: コンテナの起動を簡単に実行できるスクリプト
-- **機能**:
-  - GPU設定の自動化
-  - コンテナの起動
-  - 既存コンテナの確認と削除オプション
-  - エラーハンドリング
+### 1. Dockerfile修正
+- 既存Dockerfileベースで最小限の変更
+- CMDを `transformers chat localhost:8000 --model-name-or-path /app/cache/models/openai/gpt-oss-20b` に変更
+- ポート8000を公開
+- Pythonパッケージインストール部分は変更なし
 
-### 1.3 スクリプト共通要件
-- **実行環境**: bash（Linux/macOS対応）
-- **エラー処理**: 適切なエラーメッセージとexit code
-- **ユーザビリティ**: 分かりやすいメッセージ出力
-- **権限**: 実行権限の自動付与
+### 2. 起動スクリプト (start.sh)
+- Dockerイメージのビルド
+- 既存コンテナがあれば停止
+- ローカルモデルディレクトリをマウント
+  - デフォルト: `./model-files` → `/app/cache/models/openai/gpt-oss-20b`
+  - 環境変数 `MODEL_PATH` でカスタマイズ可能
+- ポート8000をホストにマッピング
+- コンテナ名: transformers-chat-server
+- バックグラウンド実行
 
-## 2. 既存要件（変更なし）
+### 3. 停止スクリプト (stop.sh)
+- 実行中のコンテナを停止
+- コンテナ削除オプション付き
 
-### 2.1 Docker化されたGPT OSS CLI
-- RTX 5090 GPU環境で動作
-- openai/gpt-oss-20bモデルを使用
-- 対話型CLIインターフェース
-- モデルはビルド時にダウンロード
+### 4. テストスクリプト (test_api.sh)
+- curlでAPIテスト
+- エンドポイント: http://localhost:8000
+- テストプロンプト: "Please explain how PAC1 receptor works in cell in detail"
+- レスポンス整形とエラーハンドリング
 
-## 3. ドキュメント更新要件
+## 非機能要件
+- ローカルモデル使用（Hugging Faceからのダウンロードなし）
+- 既存のPythonパッケージ構成を維持
+- GPU対応維持
 
-### 3.1 README.md
-- スクリプトを使用した手順に更新
-- 従来のDockerコマンドも併記
-- トラブルシューティングの追加
-
-### 3.2 .tmp配下のドキュメント
-- スクリプト追加に伴う設計変更を反映
-- タスクリストの更新
+## 制約事項
+- 既存Dockerfileの構造を保持
+- transformersコマンドのパスは `/app/cache/models/openai/gpt-oss-20b` 固定

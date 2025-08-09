@@ -24,6 +24,9 @@ RUN pip install torch==2.8.0 --index-url https://download.pytorch.org/whl/test/c
 RUN pip3 install git+https://github.com/triton-lang/triton.git@main#subdirectory=python/triton_kernels
 ENV HF_HOME=/app/cache
 
+# Install Pillow for transformers chat command
+RUN pip3 install Pillow
+
 # Create cache directory
 RUN mkdir -p /app/cache
 RUN pip list

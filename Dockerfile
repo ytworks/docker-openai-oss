@@ -53,4 +53,5 @@ ENV CUDA_VISIBLE_DEVICES=0
 EXPOSE 8000
 
 # Entry point for transformers chat API server
-CMD ["transformers", "chat", "localhost:8000", "--model-name-or-path", "/app/cache/models/openai/gpt-oss-20b"]
+# Using serve command instead of chat for API server mode
+CMD ["transformers", "serve", "--model-name-or-path", "/app/cache/models/openai/gpt-oss-20b", "--host", "0.0.0.0", "--port", "8000"]

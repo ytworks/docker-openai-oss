@@ -23,7 +23,7 @@ echo ""
 echo "Response:"
 echo "========="
 
-# Make API request and format response
+# Make API request with streaming disabled
 response=$(curl -s -X POST "$API_URL/v1/chat/completions" \
     -H "Content-Type: application/json" \
     -d '{
@@ -35,7 +35,8 @@ response=$(curl -s -X POST "$API_URL/v1/chat/completions" \
             }
         ],
         "temperature": 0.8,
-        "max_tokens": 512
+        "max_tokens": 512,
+        "stream": false
     }' 2>&1)
 
 # Check if request was successful
@@ -45,25 +46,47 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
-# Check if response contains error
-if echo "$response" | grep -q '"error"'; then
+# Check if response is streaming (SSE format)
+if echo "$response" | grep -q "^data: "; then
+    echo "Received streaming response. Extracting content..."
+    # Extract content from streaming response
+    content=""
+    while IFS= read -r line; do
+        if [[ $line == data:* ]]; then
+            # Remove "data: " prefix
+            json_data="${line#data: }"
+            # Skip empty data lines
+            if [ "$json_data" != "" ] && [ "$json_data" != "[DONE]" ]; then
+                # Extract delta content if available
+                delta_content=$(echo "$json_data" | jq -r '.choices[0].delta.content // empty' 2>/dev/null)
+                if [ -n "$delta_content" ]; then
+                    content="${content}${delta_content}"
+                fi
+            fi
+        fi
+    done <<< "$response"
+    
+    if [ -n "$content" ]; then
+        echo "$content"
+    else
+        echo "(No content in response)"
+    fi
+elif echo "$response" | grep -q '"error"'; then
     echo "✗ API returned an error:"
     echo "$response" | jq '.' 2>/dev/null || echo "$response"
     exit 1
-fi
-
-# Extract and display the response content
-if command -v jq &> /dev/null; then
-    # If jq is available, use it for pretty formatting
-    content=$(echo "$response" | jq -r '.choices[0].message.content' 2>/dev/null)
-    if [ $? -eq 0 ] && [ "$content" != "null" ]; then
-        echo "$content"
+else
+    # Try to extract content from standard response
+    if command -v jq &> /dev/null; then
+        content=$(echo "$response" | jq -r '.choices[0].message.content' 2>/dev/null)
+        if [ $? -eq 0 ] && [ "$content" != "null" ] && [ -n "$content" ]; then
+            echo "$content"
+        else
+            echo "$response"
+        fi
     else
         echo "$response"
     fi
-else
-    # Fallback: display raw response
-    echo "$response"
 fi
 
 echo ""

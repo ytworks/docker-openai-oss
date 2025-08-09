@@ -1,6 +1,6 @@
-# Docker GPT-OSS CLI
+# Docker GPT-OSS API Server
 
-Dockerコンテナ内で動作するGPT-OSSモデル（openai/gpt-oss-20b）のCLIツール。
+Dockerコンテナ内で動作するGPT-OSSモデル（openai/gpt-oss-20b）のAPIサーバー。OpenAI互換のAPIエンドポイントを提供します。
 
 ## 要件
 
@@ -17,8 +17,11 @@ Dockerコンテナ内で動作するGPT-OSSモデル（openai/gpt-oss-20b）のC
 # 2. モデルのダウンロード（初回のみ、約40GB）
 ./scripts/download_model.sh
 
-# 3. CLIの実行
-./scripts/run.sh
+# 3. APIサーバーの起動
+./scripts/start.sh
+
+# 4. APIのテスト
+./scripts/test_api.sh
 ```
 
 ## セットアップ
@@ -43,8 +46,6 @@ cd docker-openai-oss
 
 ### 3. ビルドと実行
 
-#### スクリプトを使用する場合（推奨）
-
 ```bash
 # 1. Dockerイメージのビルド
 ./scripts/build.sh
@@ -52,51 +53,57 @@ cd docker-openai-oss
 # 2. モデルのダウンロード（初回のみ）
 ./scripts/download_model.sh
 
-# 3. コンテナの起動
-./scripts/run.sh
+# 3. APIサーバーの起動（バックグラウンド）
+./scripts/start.sh
+
+# 4. APIサーバーの停止
+./scripts/stop.sh
+
+# コンテナの削除も行う場合
+./scripts/stop.sh --rm
 ```
 
-#### Dockerコマンドを直接使用する場合
+## APIの使用方法
+
+サーバーが起動すると、`http://localhost:8000`でOpenAI互換のAPIエンドポイントが利用可能になります。
+
+### エンドポイント
+
+- `POST /v1/chat/completions` - チャット補完
+- `GET /v1/models` - 利用可能なモデル一覧
+
+### テスト実行
 
 ```bash
-# ビルド
-docker build -t gpt-oss-cli .
-
-# 実行
-docker run --gpus all -it gpt-oss-cli
+./scripts/test_api.sh
 ```
 
-**注意**: 
-- モデルのダウンロードは別途`./scripts/download_model.sh`で実行します（約40GB）
-- モデルはプロジェクトの`cache`ディレクトリに保存され、再利用されます
-- 十分なディスク容量を確保してください
+このスクリプトは以下のテストを実行します：
+1. 利用可能なモデルの確認
+2. "hi! What is PAC1"という質問への応答テスト
+3. "what is GPR17"という質問への応答テスト
 
-## 使用方法
+### カスタムモデルパスの指定
 
-起動後、対話型プロンプトが表示されます：
+デフォルトでは`./cache`ディレクトリのモデルを使用しますが、環境変数で変更可能です：
 
+```bash
+MODEL_PATH=/path/to/your/cache ./scripts/start.sh
 ```
-Docker GPT-OSS CLI
-==================
 
-GPU: NVIDIA GeForce RTX 5090
-Memory: 24.0GB
+### APIリクエストの例
 
-Loading model...
-Model loaded successfully!
-
-==================================================
-GPT-OSS CLI Ready!
-Type 'exit' to quit
-==================================================
-
->>> こんにちは
-
-こんにちは！何かお手伝いできることがあれば、お気軽にお聞きください。
-
->>> exit
-
-Goodbye!
+```bash
+curl -X POST http://localhost:8000/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "gpt-oss-20b",
+    "messages": [
+      {"role": "user", "content": "Hello, how are you?"}
+    ],
+    "temperature": 0.8,
+    "max_tokens": 512
+  }'
 ```
 
 ## 技術仕様
@@ -109,49 +116,65 @@ Goodbye!
   - Accelerate 1.2.1+
   - Kernels
   - Triton Kernels (MXFP4サポート)
-- **CUDA**: 12.6.2 (ベースイメージ)
-
-## トラブルシューティング
-
-### GPU未検出エラー
-
-```
-Error: No NVIDIA GPU detected. Please ensure Docker is running with --gpus flag.
-```
-
-解決方法：
-- `--gpus all`フラグを付けて実行
-- NVIDIA Container Toolkitが正しくインストールされているか確認
-
-### メモリ不足エラー
-
-```
-Error: GPU out of memory. Try reducing message history.
-```
-
-解決方法：
-- 他のGPUプロセスを終了
-- より大きなGPUメモリを持つGPUを使用
+  - Pillow, rich (transformers serveの依存関係)
+- **CUDA**: 12.8.1 (ベースイメージ)
+- **APIサーバー**: transformers serve (OpenAI互換)
 
 ## スクリプトについて
 
 ### scripts/build.sh
 - Dockerイメージのビルドを実行
+- イメージ名: `gpt-oss-cli`
 - Dockerの動作確認を自動で行う
-- ビルド完了後に次のステップを案内
-
-### scripts/run.sh
-- コンテナの起動を実行
-- イメージが存在しない場合は自動でビルド
-- GPUの自動検出と設定
-- モデルキャッシュをプロジェクトの`cache`ディレクトリと共有
-- DNS設定（8.8.8.8）でネットワーク問題を回避
 
 ### scripts/download_model.sh
 - Hugging Faceからモデルをダウンロード
 - `huggingface-cli`を使用してモデルファイルを取得
 - プロジェクトの`cache`ディレクトリに保存
 - 初回のみ実行が必要（約40GB）
+
+### scripts/start.sh
+- APIサーバーをバックグラウンドで起動
+- コンテナ名: `transformers-chat-server`
+- ポート8000でリッスン
+- GPUとDNS設定を自動構成
+- カスタムモデルパス対応（`MODEL_PATH`環境変数）
+
+### scripts/stop.sh
+- 実行中のAPIサーバーを停止
+- `--rm`オプションでコンテナの削除も可能
+
+### scripts/test_api.sh
+- APIエンドポイントのテスト
+- モデル一覧の確認
+- チャット機能のテスト（2つの質問を実行）
+
+## トラブルシューティング
+
+### コンテナが起動しない
+
+```bash
+# コンテナのログを確認
+docker logs transformers-chat-server
+```
+
+### APIに接続できない
+
+- ポート8000が他のプロセスで使用されていないか確認
+- ファイアウォール設定を確認
+- コンテナが正常に起動しているか確認
+
+### GPU未検出エラー
+
+解決方法：
+- NVIDIA Container Toolkitが正しくインストールされているか確認
+- `nvidia-smi`コマンドでGPUが認識されているか確認
+
+### メモリ不足エラー
+
+解決方法：
+- 他のGPUプロセスを終了
+- より大きなGPUメモリを持つGPUを使用
 
 ## ライセンス
 

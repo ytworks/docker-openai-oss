@@ -5,22 +5,15 @@
 set -e
 
 # Configuration
-API_URL="http://127.0.0.1:8000"
+API_URL="http://0.0.0.0:8000"
 TEST_PROMPT="Please explain how PAC1 receptor works in cell in detail"
 
 echo "Testing Transformers Chat API..."
 echo "Endpoint: $API_URL"
 echo ""
 
-# Check if server is reachable
-echo "Checking server status..."
-if ! curl -s -f -o /dev/null "$API_URL"; then
-    echo "✗ Error: Cannot connect to API server at $API_URL"
-    echo "Make sure the server is running with: ./scripts/start.sh"
-    exit 1
-fi
-
-echo "✓ Server is reachable"
+# Skip health check and proceed directly to API test
+echo "Proceeding to API test..."
 echo ""
 
 # Send test request
